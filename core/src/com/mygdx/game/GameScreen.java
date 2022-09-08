@@ -1,11 +1,13 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -28,10 +30,10 @@ public class GameScreen implements Screen {
     //control how the camera views the world
     //zoom in/out? Keep everything scaled?
     private Viewport viewport;
-    private Texture emptyTile;
-    private Texture questionTile;
-    private Texture bombTile;
-    private Texture numberTile;
+    int mouseX;
+    int mouseY;
+    BitmapFont tempFont=new BitmapFont();
+    GameBoard board = new GameBoard();
 
     //runs one time, at the very beginning
     //all setup should happen here
@@ -48,26 +50,33 @@ public class GameScreen implements Screen {
 
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setAutoShapeType(true); //???, I just know that this was the solution to an annoying problem
-        questionTile= new Texture("QuestionTile.png");
     }
 
     public void clearScreen() {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
-
     //this method runs as fast as it can, repeatedly, constantly looped
     @Override
     public void render(float delta) {
         clearScreen();
+        handleClick();
         spriteBatch.begin();
-        spriteBatch.draw(questionTile,0,0);
+        board.draw(spriteBatch);
         spriteBatch.end();
+
     }
 
     @Override
     public void resize(int width, int height) {
         viewport.update(width,height);
+    }
+    public void handleClick() {
+        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+            mouseX = Gdx.input.getX();
+            mouseY = Gdx.input.getY();
+            board.handleClick(mouseX, mouseY);
+        }
     }
 
     @Override
