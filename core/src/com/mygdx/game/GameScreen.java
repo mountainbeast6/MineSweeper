@@ -59,9 +59,9 @@ public class GameScreen implements Screen {
     //this method runs as fast as it can, repeatedly, constantly looped
     @Override
     public void render(float delta) {
-        clearScreen();
         handleClick();
         spriteBatch.begin();
+        clearScreen();
         board.draw(spriteBatch);
         spriteBatch.end();
 
@@ -72,10 +72,13 @@ public class GameScreen implements Screen {
         viewport.update(width,height);
     }
     public void handleClick() {
+        mouseX = Gdx.input.getX();
+        mouseY = Gdx.input.getY();
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            mouseX = Gdx.input.getX();
-            mouseY = Gdx.input.getY();
             board.handleClick(mouseX, mouseY);
+        }
+        if(Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+            board.markClick(mouseX, mouseY);
         }
     }
 

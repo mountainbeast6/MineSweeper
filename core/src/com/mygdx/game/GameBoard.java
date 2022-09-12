@@ -40,6 +40,7 @@ public class GameBoard {
         sixtile=new Texture("sixTile.png");
         seventile=new Texture("sevenTile.png");
         eighttile=new Texture("eightTile.png");
+        flaggedTile=new Texture("flagTile.png");
     }
     public boolean isValidLoc(int row, int col) {
         return row >= 0 && row < board.length &&
@@ -51,7 +52,8 @@ public class GameBoard {
         while(bombCount<99){
             int randomRow=(int)(Math.random()* board.length);
             int randomCol=(int)(Math.random()*board[0].length);
-            if(randomRow!=rowClicked&&randomCol!=colClicked){
+            //randomRow!=rowClicked&&randomCol!=colClicked
+            if((randomRow+1<rowClicked||randomRow-1>rowClicked)||(randomCol+1<colClicked||randomCol-1>colClicked)){
                 if(board[randomRow][randomCol]%10!=9){
                     board[randomRow][randomCol]=19;
                     bombCount++;
@@ -86,7 +88,37 @@ public class GameBoard {
             firstclick=false;
         }
         if (isValidLoc(rowClicked, colClicked)) {
+            zeroClick(rowClicked,colClicked);
             board[rowClicked][colClicked] = board[rowClicked][colClicked]%10;
+        }
+    }
+    public void markClick(int x, int y) {
+        //change windows (x,y) coordinate to 2D array loc
+        int rowClicked = (y-10)/20;
+        int colClicked = (x-10)/20;
+        if (isValidLoc(rowClicked, colClicked)) {
+            if(board[rowClicked][colClicked]/10==FLAGGEDTILE){
+                board[rowClicked][colClicked] = board[rowClicked][colClicked]%10+EMPTYTILE*10;
+            }
+            else if(board[rowClicked][colClicked]/10==0){
+            }
+            else {
+                board[rowClicked][colClicked] = board[rowClicked][colClicked]%10+FLAGGEDTILE*10;
+            }
+        }
+    }
+    private void zeroClick(int x, int y){
+        if(board[x][y]/10!=0){
+            board[x][y]=board[x][y]%10;
+            if(board[x][y]==0){
+                for(int i =-1; i<2;i++) {
+                    for (int j = -1; j < 2; j++) {
+                        if (isValidLoc(x + i, y + j)) {
+                            zeroClick(x+i,y+j);
+                        }
+                    }
+                }
+            }
         }
     }
     private Texture getTexture(int val){
@@ -96,7 +128,7 @@ public class GameBoard {
             return emptyTile;
         }
         else if (cover==FLAGGEDTILE){
-            return emptyTile;
+            return flaggedTile;
         }
         else if (cover==QUESTIONTILE){
             return emptyTile;
