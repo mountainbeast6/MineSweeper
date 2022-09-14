@@ -3,8 +3,10 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class GameBoard {
@@ -25,6 +27,7 @@ public class GameBoard {
     private Texture flaggedTile;
     private int mouseX;
     private int mouseY;
+    private String gameOverStyle;
     private static final int BOMB=9, EMPTYTILE=1,FLAGGEDTILE=2,QUESTIONTILE=3;
     private int [] [] board;
     public GameBoard(){
@@ -49,7 +52,7 @@ public class GameBoard {
 
     private void placeBombs(int rowClicked, int colClicked){
         int bombCount = 0;
-        while(bombCount<99){
+        while(bombCount<100){
             int randomRow=(int)(Math.random()* board.length);
             int randomCol=(int)(Math.random()*board[0].length);
             //randomRow!=rowClicked&&randomCol!=colClicked
@@ -87,9 +90,11 @@ public class GameBoard {
             initBoardNumbers();
             firstclick=false;
         }
-        if (isValidLoc(rowClicked, colClicked)) {
-            zeroClick(rowClicked,colClicked);
-            board[rowClicked][colClicked] = board[rowClicked][colClicked]%10;
+        if(!isGameDone()) {
+            if (isValidLoc(rowClicked, colClicked)) {
+                zeroClick(rowClicked, colClicked);
+                board[rowClicked][colClicked] = board[rowClicked][colClicked] % 10;
+            }
         }
     }
     public void markClick(int x, int y) {
@@ -163,11 +168,49 @@ public class GameBoard {
         return fixed;
     }
     public void draw(SpriteBatch spriteBatch){
+        BitmapFont font = new BitmapFont();
+        font.getData().setScale(3);
         for(int row=0; row < board.length; row++) {
             for(int col=0; col < board[row].length; col++) {
                 spriteBatch.draw(getTexture(board[row][col]), (10) + (col*20),(600-35) - (row * 20));
             }
         }
+        if(isGameDone()){
+            font.draw(spriteBatch,gameOverStyle, 300, 90);
+        }
+    }
+
+    public boolean isGameDone(){
+        int count =0;
+        for(int row=0; row < board.length; row++) {
+            for(int col=0; col < board[row].length; col++) {
+                if(board[row][col]==9){
+                    revealAllBombs();
+                    gameOverStyle="Awwww You Lost!";
+                    return true;
+                }
+                if(board[row][col]==29){
+                    count++;
+                }
+            }
+        }
+        if (count==100){
+            gameOverStyle="Yay You Won!";
+            return true;
+        }
+        return false;
+    }
+    public int revealAllBombs(){
+        int count=0;
+        for(int row=0; row < board.length; row++) {
+            for(int col=0; col < board[row].length; col++) {
+                if(board[row][col]%10==9){
+                    board[row][col]=9;
+                    count++;
+                }
+            }
+        }
+        return count;
     }
     private void initEmptyBoard(){
         for(int i=0;i< board.length;i++){

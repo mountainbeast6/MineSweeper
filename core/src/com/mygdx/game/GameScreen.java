@@ -80,6 +80,9 @@ public class GameScreen implements Screen {
         if(Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
             board.markClick(mouseX, mouseY);
         }
+        if(Gdx.input.isButtonJustPressed(Input.Buttons.MIDDLE)){
+            System.out.println(board.revealAllBombs());
+        }
     }
 
     @Override
